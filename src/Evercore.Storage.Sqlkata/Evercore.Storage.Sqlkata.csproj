@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.1.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Evercore\Evercore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SqlKata" Version="3.2.3" />
+    <PackageReference Include="SqlKata.Execution" Version="3.2.3" />
+  </ItemGroup>
+</Project>

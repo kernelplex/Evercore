@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9425DBEA-EAC1-4840-AC34-C307896D4A0E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F26DF0B5-8C0F-46ED-8404-EFFF50FF2C1F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{517FA6E2-58CA-4281-AA15-DE5C752DEDD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evercore", "src\Evercore\Evercore.csproj", "{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evercore.Storage.Sqlkata", "src\Evercore.Storage.Sqlkata\Evercore.Storage.Sqlkata.csproj", "{73715D26-111A-450F-8E8A-93443150C8AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evercore.Tests", "src\Tests\Evercore.Tests\Evercore.Tests.csproj", "{6C2E9F94-5AD6-4198-889B-443658D156F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageEngine.IntegrationTests", "src\Tests\StorageEngine.IntegrationTests\StorageEngine.IntegrationTests.csproj", "{69726544-7685-4334-9BBC-E79CB39DEF62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evercore.Storage.SqlKata.FluentMigrations", "src\Evercore.Storage.SqlKata.FluentMigrations\Evercore.Storage.SqlKata.FluentMigrations.csproj", "{9EE9381B-BE0C-4CA6-A5B2-59836B86C144}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F26DF0B5-8C0F-46ED-8404-EFFF50FF2C1F} = {9425DBEA-EAC1-4840-AC34-C307896D4A0E}
+		{517FA6E2-58CA-4281-AA15-DE5C752DEDD4} = {9425DBEA-EAC1-4840-AC34-C307896D4A0E}
+		{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793} = {9425DBEA-EAC1-4840-AC34-C307896D4A0E}
+		{73715D26-111A-450F-8E8A-93443150C8AA} = {9425DBEA-EAC1-4840-AC34-C307896D4A0E}
+		{6C2E9F94-5AD6-4198-889B-443658D156F0} = {517FA6E2-58CA-4281-AA15-DE5C752DEDD4}
+		{69726544-7685-4334-9BBC-E79CB39DEF62} = {517FA6E2-58CA-4281-AA15-DE5C752DEDD4}
+		{9EE9381B-BE0C-4CA6-A5B2-59836B86C144} = {9425DBEA-EAC1-4840-AC34-C307896D4A0E}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BAD3EB3-9C9C-45BF-8144-8949ADEC0793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73715D26-111A-450F-8E8A-93443150C8AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73715D26-111A-450F-8E8A-93443150C8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73715D26-111A-450F-8E8A-93443150C8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73715D26-111A-450F-8E8A-93443150C8AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C2E9F94-5AD6-4198-889B-443658D156F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C2E9F94-5AD6-4198-889B-443658D156F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C2E9F94-5AD6-4198-889B-443658D156F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C2E9F94-5AD6-4198-889B-443658D156F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69726544-7685-4334-9BBC-E79CB39DEF62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69726544-7685-4334-9BBC-E79CB39DEF62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69726544-7685-4334-9BBC-E79CB39DEF62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69726544-7685-4334-9BBC-E79CB39DEF62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EE9381B-BE0C-4CA6-A5B2-59836B86C144}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EE9381B-BE0C-4CA6-A5B2-59836B86C144}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EE9381B-BE0C-4CA6-A5B2-59836B86C144}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EE9381B-BE0C-4CA6-A5B2-59836B86C144}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
