@@ -1,41 +1,39 @@
 using Evercore.Storage.SqlKata;
 using Evercore.Storage.SqlKata.FluentMigrations;
 using FluentMigrator.Runner;
-using Microsoft.Extensions.DependencyInjection;
-using MySql.Data.MySqlClient;
+using Npgsql;
 using SqlKata.Compilers;
 using SqlKata.Execution;
-using Testcontainers.MySql;
+using Testcontainers.PostgreSql;
 
 namespace StorageEngine.IntegrationTests;
 
-public class MySqlContainerFixture : IDisposable
+public class PostgresContainerFixture : IDisposable
 {
-    private MySqlContainer _dbContainer;
+    private PostgreSqlContainer _dbContainer;
 
     public string ConnectionString => _dbContainer.GetConnectionString();
     public SqlKataStorageEngine StorageEngine { get; }
 
-    public MySqlContainerFixture()
+    public PostgresContainerFixture()
     {
-        
         _dbContainer = BuildContainer();
-        var compiler = new MySqlCompiler();
+        var compiler = new PostgresCompiler();
         var task = _dbContainer.StartAsync();
         task.Wait();
         var connectionString = _dbContainer.GetConnectionString();
         ApplyMigrations(connectionString);
         StorageEngine = new SqlKataStorageEngine(async (CancellationToken stoppingToken) =>
         {
-            var connection = new MySqlConnection(connectionString);
+            var connection = new NpgsqlConnection(connectionString);
             await connection.OpenAsync(stoppingToken);
             return new QueryFactory(connection, compiler);
         });
     }
     
-    public static MySqlContainer BuildContainer()
+    public static PostgreSqlContainer BuildContainer()
     {
-        var dbcontainer = new MySqlBuilder()
+        var dbcontainer = new PostgreSqlBuilder()
             .WithDatabase("app")
             .WithUsername("postgresql")
             .WithPassword("S3cr3t")
@@ -49,7 +47,7 @@ public class MySqlContainerFixture : IDisposable
     {
         MigrationRunnerExecutor.MigrateUp((x) =>
         {
-            x.AddMySql8().WithGlobalConnectionString(connectionString);
+            x.AddPostgres().WithGlobalConnectionString(connectionString);
         });
     }
 
@@ -60,5 +58,4 @@ public class MySqlContainerFixture : IDisposable
         var disposeTask = _dbContainer.DisposeAsync();
         disposeTask.AsTask().Wait();
     }
-    
 }

@@ -10,17 +10,17 @@ namespace Evercore.Storage.SqlKata;
 
 using QueryFactoryProvider = Func<CancellationToken, Task<QueryFactory>>;
 
-public class SqlKataStorageEngine: IStorageEngine
+public class SqlKataStorageEngine : IStorageEngine
 {
     #region Fields
-    
+
     private readonly QueryFactoryProvider _queryFactoryProvider;
 
     #endregion
 
 
     #region Constructors/Destructors
-    
+
     public SqlKataStorageEngine(QueryFactoryProvider queryFactoryProvider)
     {
         _queryFactoryProvider = queryFactoryProvider;
@@ -29,17 +29,18 @@ public class SqlKataStorageEngine: IStorageEngine
     #endregion
 
     #region Methods
-public async Task<int> GetAggregateTypeId(AggregateType aggregateType, CancellationToken cancellationToken)
+
+    public async Task<int> GetAggregateTypeId(AggregateType aggregateType, CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
-        
+
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         // Try to get any existing values.
         var selectQuery = queryFactory.Query(Tables.AggregateTypes)
             .Where("Name", aggregateType.Value)
             .Select("Id");
-        
+
         var result = await selectQuery.FirstOrDefaultAsync<int?>(cancellationToken: cancellationToken);
         if (result is not null)
         {
@@ -53,13 +54,14 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         {
             Name = aggregateType.Value
         }, cancellationToken: cancellationToken);
-        
+
         transactionScope.Complete();
-        
+
         return id;
     }
 
-    public async Task<long> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey, CancellationToken cancellationToken)
+    public async Task<long> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey,
+        CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -85,7 +87,7 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
             NaturalKey = naturalKey?.Value,
             Sequence = 0
         }, cancellationToken: cancellationToken);
-        
+
         transactionScope.Complete();
         return id;
     }
@@ -93,14 +95,14 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
     public async Task<int> GetEventTypeId(EventType eventType, CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
-        
+
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         // Try to get any existing values.
         var selectQuery = queryFactory.Query(Tables.EventTypes)
             .Where("Name", eventType.Value)
             .Select("Id");
-        
+
         var result = await selectQuery.FirstOrDefaultAsync<int?>(cancellationToken: cancellationToken);
         if (result is not null)
         {
@@ -114,25 +116,26 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         {
             Name = eventType.Value
         }, cancellationToken: cancellationToken);
-        
+
         transactionScope.Complete();
-        
+
         return id;
     }
 
-    public async Task<long> GetAgentId(int agentTypeId, AgentKey? agentKey, long? systemId, CancellationToken cancellationToken)
+    public async Task<long> GetAgentId(int agentTypeId, AgentKey? agentKey, long? systemId,
+        CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
-        
+
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         // Try to get any existing values.
         var selectQuery = queryFactory.Query(Tables.Agents)
             .Where("AgentTypeId", agentTypeId)
             .Where("AgentKey", agentKey?.Value)
             .Where("SystemId", systemId)
             .Select("Id");
-        
+
         var result = await selectQuery.FirstOrDefaultAsync<long?>(cancellationToken: cancellationToken);
         if (result is not null)
         {
@@ -148,24 +151,24 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
             AgentKey = agentKey?.Value,
             SystemId = systemId
         }, cancellationToken: cancellationToken);
-        
+
         transactionScope.Complete();
-        
+
         return id;
-        
+
     }
 
     public async Task<int> GetAgentTypeId(AgentType agentType, CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
-        
+
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         // Try to get any existing values.
         var selectQuery = queryFactory.Query(Tables.AgentTypes)
             .Where("Name", agentType.Value)
             .Select("Id");
-        
+
         var result = await selectQuery.FirstOrDefaultAsync<int?>(cancellationToken: cancellationToken);
         if (result is not null)
         {
@@ -179,9 +182,9 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         {
             Name = agentType.Value
         }, cancellationToken: cancellationToken);
-        
+
         transactionScope.Complete();
-        
+
         return id;
     }
 
@@ -192,7 +195,7 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
 
         var eventDtoList = eventDtos.ToList();
         var existingAggregateIds = eventDtoList.Select(
-            x => (aggregateTypeId: x.AggregateTypeId, aggregateId: x.AggregateId))
+                x => (aggregateTypeId: x.AggregateTypeId, aggregateId: x.AggregateId))
             .Distinct();
 
         Dictionary<long, long> aggregateSequences = new Dictionary<long, long>();
@@ -214,6 +217,7 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
                     @eventDto.AggregateId, @eventDto.Sequence);
             }
 
+            // Ensure times are stored as universal times
             var eventTime = eventDto.EventTime.Kind != DateTimeKind.Utc
                 ? eventDto.EventTime.ToUniversalTime()
                 : eventDto.EventTime;
@@ -241,12 +245,14 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
                     Sequence = newSequence
                 }, cancellationToken: cancellationToken);
         }
+
         transactionScope.Complete();
     }
 
 
-    
-    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long sequence, CancellationToken cancellationToken)
+
+    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long sequence,
+        CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         var eventQuery = queryFactory.Query($"{Tables.AggregateEvents} as ev")
@@ -272,12 +278,13 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         List<AggregateEvent> events = new();
         foreach (var result in results)
         {
-             events.Add((AggregateEvent) result);
+            events.Add((AggregateEvent) result);
         }
+
         return events;
     }
 
-    
+
     public async Task SaveSnapshot(SnapshotDto snapshotDto, CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
@@ -291,7 +298,7 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
                 snapshotDto.Sequence,
                 snapshotDto.State
             }, cancellationToken: cancellationToken);
-        
+
         await queryFactory.Query(Tables.Snapshots)
             .Where("AggregateTypeId", snapshotDto.AggregateTypeId)
             .Where("AggregateId", snapshotDto.AggregateId)
@@ -300,8 +307,9 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         scope.Complete();
     }
 
-    
-    public async Task<Option<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version, CancellationToken cancellationToken)
+
+    public async Task<Option<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
+        CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         var snapshotQuery = queryFactory.Query(Tables.Snapshots)
@@ -315,15 +323,17 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
             .Where("AggregateId", aggregateId)
             .Where("Version", "=", version)
             .OrderByDesc("Sequence");
-            
-        var snapshotDto = await snapshotQuery.FirstOrDefaultAsync<SnapshotQueryResult>(cancellationToken: cancellationToken);
-        
+
+        var snapshotDto =
+            await snapshotQuery.FirstOrDefaultAsync<SnapshotQueryResult>(cancellationToken: cancellationToken);
+
         return snapshotDto is null ? new None<Snapshot>() : new Some<Snapshot>(snapshotDto);
     }
+
     #endregion
-    
+
     #region Inner Classes
-    
+
     private class EventQueryResult
     {
         public long AggregateId { get; }
@@ -349,6 +359,7 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
             SystemId = systemId;
             EventTime = DateTime.Parse(eventTime);
         }
+
         public EventQueryResult(
             long aggregateId,
             string aggregateType,
@@ -371,17 +382,18 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
             EventTime = eventTime;
         }
 
-        
+
         public static explicit operator AggregateEvent(EventQueryResult result)
         {
             var agentKey = result.AgentKey is null ? null : (AgentKey) result.AgentKey;
             var systemId = result.SystemId;
             var agent = new Agent((AgentType) result.AgentType, systemId, agentKey);
-            
-             var aggregateEvent = new AggregateEvent(
-                (AggregateType) result.AggregateType, result.AggregateId, (EventType) result.EventType, result.Sequence, result.Data,
+
+            var aggregateEvent = new AggregateEvent(
+                (AggregateType) result.AggregateType, result.AggregateId, (EventType) result.EventType, result.Sequence,
+                result.Data,
                 agent, result.EventTime);
-             return aggregateEvent;
+            return aggregateEvent;
         }
     }
 
@@ -394,20 +406,22 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
         public long Sequence { get; init; }
         public string State { get; init; }
 
-        public SnapshotQueryResult(string aggregateType, long aggregateId, int snapshotVersion, long sequence, string state)
+        public SnapshotQueryResult(string aggregateType, long aggregateId, int snapshotVersion, long sequence,
+            string state)
         {
             this.AggregateType = aggregateType;
             this.AggregateId = aggregateId;
-            this.SnapshotVersion =  snapshotVersion;
+            this.SnapshotVersion = snapshotVersion;
             this.Sequence = sequence;
             this.State = state;
         }
-        
-        public SnapshotQueryResult(string aggregateType, long aggregateId, long snapshotVersion, long sequence, string state)
+
+        public SnapshotQueryResult(string aggregateType, long aggregateId, long snapshotVersion, long sequence,
+            string state)
         {
             this.AggregateType = aggregateType;
             this.AggregateId = aggregateId;
-            this.SnapshotVersion =  (int) snapshotVersion;
+            this.SnapshotVersion = (int) snapshotVersion;
             this.Sequence = sequence;
             this.State = state;
         }
@@ -422,5 +436,6 @@ public async Task<int> GetAggregateTypeId(AggregateType aggregateType, Cancellat
                 value.State);
         }
     }
+
     #endregion
 }

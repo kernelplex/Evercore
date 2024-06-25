@@ -11,6 +11,6 @@ public record AggregateType : StrongName
     {
     }
 
-    public static explicit operator AggregateType(string value) => new AggregateType(value);
+    public static explicit operator AggregateType(string value) => new(value);
     public static implicit operator AggregateType(Enum value) => new(value.ToString());
 }

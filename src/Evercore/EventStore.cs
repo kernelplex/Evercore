@@ -100,7 +100,8 @@ public class EventStore: IEventStore, IEventStoreContextManager
         
         var context = new EventStoreContext(this);
         var result = await action(context, cancellationToken);
-        await WriteEventsAndSnapshots(context, cancellationToken);
+        await WriteEvents(context, cancellationToken);
+        await WriteSnapshots(context, cancellationToken);
         
         scope.Complete();
         return result;
@@ -112,18 +113,15 @@ public class EventStore: IEventStore, IEventStoreContextManager
         
         var context = new EventStoreContext(this);
         await action(context, cancellationToken);
-        await WriteEventsAndSnapshots(context, cancellationToken);
+        await WriteEvents(context, cancellationToken);
+        await WriteSnapshots(context, cancellationToken);
         
         scope.Complete();
     }
 
-    private async Task WriteEventsAndSnapshots(EventStoreContext context, CancellationToken cancellationToken)
-    {
-        var capturedEvents = context.GetCapturedEvents();
-        var eventDtos = await Task.WhenAll(capturedEvents.Select(async x => 
-            await ConvertToEventDto(x, cancellationToken)));
-        await _storageEngine.StoreEvents(eventDtos, cancellationToken);
 
+    private async Task WriteSnapshots(EventStoreContext context, CancellationToken cancellationToken)
+    {
         var snapshotAggregates = context.GetAggregatesRequiringSnapshots();
         foreach (var aggregate in snapshotAggregates)
         {
@@ -131,6 +129,14 @@ public class EventStore: IEventStore, IEventStoreContextManager
             var snapshotDto = await ConvertToSnapshotRecord(snapshot, cancellationToken);
             await _storageEngine.SaveSnapshot(snapshotDto, cancellationToken);
         }
+    }
+
+    private async Task WriteEvents(EventStoreContext context, CancellationToken cancellationToken)
+    {
+        var capturedEvents = context.GetCapturedEvents();
+        var eventDtos = await Task.WhenAll(capturedEvents.Select(async x => 
+            await ConvertToEventDto(x, cancellationToken)));
+        await _storageEngine.StoreEvents(eventDtos, cancellationToken);
     }
 
     private async Task<SnapshotDto> ConvertToSnapshotRecord(Snapshot snapshot, CancellationToken cancellationToken)
@@ -206,7 +212,6 @@ public class EventStore: IEventStore, IEventStoreContextManager
     {
         var aggregateTypeId = await GetAggregateTypeId(aggregateType, cancellationToken);
         
-        // TODO: Maybe we want an LRUCache for this.
         var id = await _storageEngine.CreateAggregate(aggregateTypeId, naturalKey, cancellationToken);
         return id;
     }

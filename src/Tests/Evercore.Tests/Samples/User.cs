@@ -23,7 +23,7 @@ public class User: ISnapshotAggregate
     public string LastName { get; private set; } = "";
     public string Email { get; private set; } = "";
     
-    public static AggregateType AggregateType => AggregateTypes.User;
+    public static AggregateType AggregateType => (AggregateType) nameof(AggregateTypes.User);
     public static int SnapshotVersion => 1;
     
     public static IAggregate Initialize(long id)

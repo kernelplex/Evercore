@@ -1,15 +1,13 @@
 using Evercore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace StorageEngine.IntegrationTests;
 
-public class SqliteStorageEngineTests : StorageEngineTestsBase, IClassFixture<SqliteFixture> 
+public class PostgresStorageEngineTest : StorageEngineTestsBase, IClassFixture<PostgresContainerFixture>
 {
     protected override IStorageEngine? StorageEngine { get; set; }
     
-    public SqliteStorageEngineTests(SqliteFixture containerFixture)
+    public PostgresStorageEngineTest(PostgresContainerFixture containerFixture)
     {
         StorageEngine = containerFixture.StorageEngine;
     }
-
 }
