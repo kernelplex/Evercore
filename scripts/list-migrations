@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+dotnet fm list migrations --processor Postgresql --assembly src/Evercore.Storage.SqlKata.FluentMigrations/bin/Release/net8.0/Evercore.Storage.SqlKata.FluentMigrations.dll --no-connection
