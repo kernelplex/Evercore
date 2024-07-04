@@ -1,7 +1,8 @@
 using System.Text.Json;
 using Evercore.Data;
-using Evercore.Monads;
 using Evercore.StrongTypes;
+using KernelPlex.Monads;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore.Context;
 
@@ -24,7 +25,7 @@ public class EventStoreContext: IEventStoreContext
     }
 
 
-    public async Task<Option<T>> Load<T>(long id, CancellationToken cancellationToken = default) where T : IAggregate
+    public async Task<IOption<T>> Load<T>(long id, CancellationToken cancellationToken = default) where T : IAggregate
     {
         var aggregateType = T.AggregateType;
         

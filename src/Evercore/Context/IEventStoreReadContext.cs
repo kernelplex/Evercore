@@ -1,8 +1,7 @@
 using Evercore.Data;
-using Evercore.Monads;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore.Context;
-
 public interface IEventStoreReadContext
 {
     /// <summary>
@@ -12,6 +11,6 @@ public interface IEventStoreReadContext
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <typeparam name="T">The type of the aggregate.</typeparam>
     /// <returns>An optional aggregate of type T.</returns>
-    Task<Option<TAggregate>> Load<TAggregate>(long id, CancellationToken cancellationToken = default)
+    Task<IOption<TAggregate>> Load<TAggregate>(long id, CancellationToken cancellationToken = default)
         where TAggregate : IAggregate;
 }

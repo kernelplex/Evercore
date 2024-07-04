@@ -15,7 +15,7 @@ ignore-scripts/
 
 # Mono auto generated files
 mono_crash.*
-
+nuget.config
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

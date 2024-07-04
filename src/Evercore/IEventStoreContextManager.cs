@@ -1,6 +1,6 @@
 using Evercore.Data;
-using Evercore.Monads;
 using Evercore.StrongTypes;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore;
 
@@ -47,6 +47,6 @@ public interface IEventStoreContextManager
     /// <param name="version">The version of the snapshot.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The snapshot of the aggregate at the specified version.</returns>
-    Task<Option<Snapshot>> GetSnapshot(AggregateType aggregateType, long id, int version,
+    Task<IOption<Snapshot>> GetSnapshot(AggregateType aggregateType, long id, int version,
         CancellationToken cancellationToken);
 }

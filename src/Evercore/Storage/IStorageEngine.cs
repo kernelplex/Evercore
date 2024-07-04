@@ -1,6 +1,6 @@
 using Evercore.Data;
-using Evercore.Monads;
 using Evercore.StrongTypes;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore.Storage;
 
@@ -84,6 +84,6 @@ public interface IStorageEngine
     /// <param name="version">The version of the snapshot.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The result contains an optional snapshot.</returns>
-    Task<Option<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
+    Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
         CancellationToken cancellationToken);
 }

@@ -1,8 +1,9 @@
 ﻿using System.Transactions;
 using Evercore.Data;
 using Evercore.Exceptions;
-using Evercore.Monads;
 using Evercore.StrongTypes;
+using KernelPlex.Monads;
+using KernelPlex.Tools.Monads.Options;
 using SqlKata.Execution;
 // ReSharper disable UnusedMember.Local
 
@@ -308,7 +309,7 @@ public class SqlKataStorageEngine : IStorageEngine
     }
 
 
-    public async Task<Option<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
+    public async Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
         CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);

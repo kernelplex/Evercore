@@ -1,7 +1,8 @@
 using Evercore.Data;
 using Evercore.Exceptions;
-using Evercore.Monads;
 using Evercore.StrongTypes;
+using KernelPlex.Monads;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore.Storage;
 
@@ -105,7 +106,7 @@ public class TransientMemoryStorageEngine: IStorageEngine
         _snapshotDictionary[(snapshotDto.AggregateTypeId, snapshotDto.AggregateId)] = snapshotDto;
     }
 
-    public async Task<Option<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version, 
+    public async Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version, 
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;

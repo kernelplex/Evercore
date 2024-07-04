@@ -5,10 +5,10 @@ using System.Transactions;
 using Evercore.Context;
 using Evercore.Data;
 using Evercore.Exceptions;
-using Evercore.Monads;
 using Evercore.Storage;
 using Evercore.StrongTypes;
 using Evercore.Tools;
+using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore;
 
@@ -222,7 +222,7 @@ public class EventStore: IEventStore, IEventStoreContextManager
         return await _storageEngine.GetAggregateEvents(aggregateTypeId, id, sequence, cancellationToken);
     }
 
-    public async Task<Option<Snapshot>> GetSnapshot(AggregateType aggregateType, long userId, int version, 
+    public async Task<IOption<Snapshot>> GetSnapshot(AggregateType aggregateType, long userId, int version, 
         CancellationToken cancellationToken)
     {
         var aggregateTypeId = await GetAggregateTypeId(aggregateType, cancellationToken);
