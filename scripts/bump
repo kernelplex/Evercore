@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+setversion -r `gitversion | jq -r '[.Major, .Minor, .Patch, .PreReleaseNumber] | join(".")'`

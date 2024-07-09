@@ -1,0 +1,9 @@
+mode: ContinuousDeployment
+next-version: 0.1.0
+branches:
+  master: 
+    regex: (^master$|^origin\/master$|^main$|^origin\/main$)
+ignore:
+  sha: []
+merge-message-formats: {}
+assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{PrereleaseNumber}'
