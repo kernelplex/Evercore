@@ -252,8 +252,9 @@ public class SqlKataStorageEngine : IStorageEngine
 
 
 
-    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long sequence,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long minSequence,
+        CancellationToken cancellationToken,
+        long? maxSequence)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         var eventQuery = queryFactory.Query($"{Tables.AggregateEvents} as ev")
@@ -272,8 +273,13 @@ public class SqlKataStorageEngine : IStorageEngine
             .LeftJoin($"{Tables.AgentTypes} as agtT", "agt.AgentTypeId", "agtT.Id")
             .Where("ev.AggregateTypeId", aggregateTypeId)
             .Where("ev.AggregateId", id)
-            .Where("ev.Sequence", ">", sequence)
+            .Where("ev.Sequence", ">", minSequence)
             .OrderBy("ev.Sequence");
+        
+        if (maxSequence is not null)
+        {
+            eventQuery.Where($"ev.Sequence", "<=", maxSequence.Value);
+        }
 
         var results = await eventQuery.GetAsync<EventQueryResult>(cancellationToken: cancellationToken);
         List<AggregateEvent> events = new();
@@ -310,7 +316,8 @@ public class SqlKataStorageEngine : IStorageEngine
 
 
     public async Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? maxSequence)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         var snapshotQuery = queryFactory.Query(Tables.Snapshots)
@@ -324,6 +331,11 @@ public class SqlKataStorageEngine : IStorageEngine
             .Where("AggregateId", aggregateId)
             .Where("Version", "=", version)
             .OrderByDesc("Sequence");
+
+        if (maxSequence is not null)
+        {
+            snapshotQuery.Where($"{Tables.Snapshots}.Sequence", "<=", maxSequence.Value);
+        }
 
         var snapshotDto =
             await snapshotQuery.FirstOrDefaultAsync<SnapshotQueryResult>(cancellationToken: cancellationToken);

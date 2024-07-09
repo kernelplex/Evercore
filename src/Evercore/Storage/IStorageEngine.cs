@@ -60,16 +60,17 @@ public interface IStorageEngine
     Task StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Retrieves the aggregate events for the specified <paramref name="aggregateTypeId"/>, <paramref name="id"/>, and <paramref name="sequence"/>.
+    /// Retrieves the aggregate events for the specified <paramref name="aggregateTypeId"/>, <paramref name="id"/>, and <paramref name="minSequence"/>.
     /// </summary>
     /// <param name="aggregateTypeId">The aggregate type ID.</param>
     /// <param name="id">The aggregate ID.</param>
-    /// <param name="sequence">The event sequence number.</param>
+    /// <param name="minSequence">The event sequence number.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="maxSequence">If not null, specifies the maximum sequence to return.</param>
     /// <returns>A task representing the asynchronous operation. The result contains a collection of aggregate events.</returns>
-    Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long sequence,
-        CancellationToken cancellationToken);
-
+    Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long minSequence,
+        CancellationToken cancellationToken, long? maxSequence = null);
+ 
     /// <summary>
     /// Saves the snapshot specified by the <paramref name="snapshotDto"/>.
     /// </summary>
@@ -83,7 +84,8 @@ public interface IStorageEngine
     /// <param name="aggregateId">The ID of the aggregate.</param>
     /// <param name="version">The version of the snapshot.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="maxSequence">If not null, specifies the maximum snapshot sequence to return.</param>
     /// <returns>A task representing the asynchronous operation. The result contains an optional snapshot.</returns>
     Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken, long? maxSequence = null);
 }

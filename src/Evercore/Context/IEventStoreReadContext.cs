@@ -11,6 +11,6 @@ public interface IEventStoreReadContext
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <typeparam name="T">The type of the aggregate.</typeparam>
     /// <returns>An optional aggregate of type T.</returns>
-    Task<IOption<TAggregate>> Load<TAggregate>(long id, CancellationToken cancellationToken = default)
+    Task<IOption<TAggregate>> Load<TAggregate>(long id, long? maxSequence = null, CancellationToken cancellationToken = default)
         where TAggregate : IAggregate;
 }

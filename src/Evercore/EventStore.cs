@@ -216,16 +216,19 @@ public class EventStore: IEventStore, IEventStoreContextManager
         return id;
     }
 
-    public async Task<IEnumerable<AggregateEvent>> GetEvents(AggregateType aggregateType, long id, long sequence, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AggregateEvent>> GetEvents(AggregateType aggregateType, long id, long sequence, CancellationToken cancellationToken,
+        long? maxSequence = null)
     {
         var aggregateTypeId = await GetAggregateTypeId(aggregateType, cancellationToken);
-        return await _storageEngine.GetAggregateEvents(aggregateTypeId, id, sequence, cancellationToken);
+        return await _storageEngine.GetAggregateEvents(aggregateTypeId, id, sequence, cancellationToken, 
+            maxSequence: maxSequence);
     }
 
     public async Task<IOption<Snapshot>> GetSnapshot(AggregateType aggregateType, long userId, int version, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, long? maxSequence = null)
     {
         var aggregateTypeId = await GetAggregateTypeId(aggregateType, cancellationToken);
-        return await _storageEngine.GetSnapshot(aggregateTypeId, userId, version, cancellationToken);
+        return await _storageEngine.GetSnapshot(aggregateTypeId, userId, version, cancellationToken, 
+            maxSequence: maxSequence);
     }
 }

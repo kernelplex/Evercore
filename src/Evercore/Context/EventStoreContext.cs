@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Evercore.Data;
 using Evercore.StrongTypes;
-using KernelPlex.Monads;
 using KernelPlex.Tools.Monads.Options;
 
 namespace Evercore.Context;
@@ -25,7 +24,7 @@ public class EventStoreContext: IEventStoreContext
     }
 
 
-    public async Task<IOption<T>> Load<T>(long id, CancellationToken cancellationToken = default) where T : IAggregate
+    public async Task<IOption<T>> Load<T>(long id, long? maxSequence = null, CancellationToken cancellationToken = default) where T : IAggregate
     {
         var aggregateType = T.AggregateType;
         
@@ -35,7 +34,9 @@ public class EventStoreContext: IEventStoreContext
         if (aggregate is ISnapshotAggregateTraits snapshotAggregate)
         {
             var version = snapshotAggregate.GetCurrentSnapshotVersion();
-            var maybeSnapshot = await _eventStoreContextManager.GetSnapshot(aggregateType, id, version, cancellationToken);
+            var maybeSnapshot = await _eventStoreContextManager.GetSnapshot(aggregateType, id, version, 
+                cancellationToken,
+                maxSequence: maxSequence);
             if (maybeSnapshot is Some<Snapshot> snapshot)
             {
                 snapshotAggregate.ApplySnapshot(snapshot.Value);
@@ -45,7 +46,8 @@ public class EventStoreContext: IEventStoreContext
         }
 
         var events = await _eventStoreContextManager.GetEvents(aggregateType, id, sequence,
-            cancellationToken);
+            cancellationToken, 
+            maxSequence: maxSequence);
         
         foreach (var currentEvent in events)
         {

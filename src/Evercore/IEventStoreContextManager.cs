@@ -27,9 +27,10 @@ public interface IEventStoreContextManager
     /// <param name="id">The ID of the aggregate.</param>
     /// <param name="sequence">The sequence number starting point.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="maxSequence">Maximum sequence of events to retrieve.</param>
     /// <returns>A collection of aggregate events.</returns>
     Task<IEnumerable<AggregateEvent>> GetEvents(AggregateType aggregateType, long id, long sequence,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken, long? maxSequence = null);
 
     /// <summary>
     /// Deserializes the given data into an object of the specified <paramref name="eventType"/>.
@@ -46,7 +47,8 @@ public interface IEventStoreContextManager
     /// <param name="id">The ID of the aggregate.</param>
     /// <param name="version">The version of the snapshot.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="maxSequence">Maximum sequence of snapshot to retrieve.</param>
     /// <returns>The snapshot of the aggregate at the specified version.</returns>
     Task<IOption<Snapshot>> GetSnapshot(AggregateType aggregateType, long id, int version,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken, long? maxSequence = null);
 }

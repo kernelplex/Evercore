@@ -84,10 +84,11 @@ public class TransientMemoryStorageEngine: IStorageEngine
         return dto.Id;
     }
 
-    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long aggregateId, long sequence, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long aggregateId,
+        long minSequence, CancellationToken cancellationToken, long? maxSequence)
     {
         var results = _events
-            .Where(x => x.AggregateTypeId == aggregateTypeId && x.AggregateId == aggregateId && x.Sequence > sequence)
+            .Where(x => x.AggregateTypeId == aggregateTypeId && x.AggregateId == aggregateId && x.Sequence > minSequence && (maxSequence is null ||  x.Sequence <= maxSequence))
             .Select(ToAggregateEvent);
         return await Task.FromResult(results);
     }
@@ -106,12 +107,18 @@ public class TransientMemoryStorageEngine: IStorageEngine
         _snapshotDictionary[(snapshotDto.AggregateTypeId, snapshotDto.AggregateId)] = snapshotDto;
     }
 
-    public async Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version, 
-        CancellationToken cancellationToken)
+    public async Task<IOption<Snapshot>> GetSnapshot(int aggregateTypeId, long aggregateId, int version,
+        CancellationToken cancellationToken, long? maxSequence = null)
     {
         await Task.CompletedTask;
         _snapshotDictionary.TryGetValue((aggregateTypeId, aggregateId), out var dto);
+        
         if (dto is null)
+        {
+            return new None<Snapshot>();
+        }
+        
+        if (maxSequence is not null && dto.Sequence > maxSequence)
         {
             return new None<Snapshot>();
         }

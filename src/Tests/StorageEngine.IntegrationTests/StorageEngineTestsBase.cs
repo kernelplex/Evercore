@@ -3,7 +3,6 @@ using Evercore.Exceptions;
 using Evercore.Storage;
 using Evercore.StrongTypes;
 using FluentAssertions;
-using KernelPlex.Monads;
 using KernelPlex.Tools.Monads.Options;
 
 namespace StorageEngine.IntegrationTests;
@@ -280,6 +279,55 @@ public abstract class StorageEngineTestsBase
     }
 
     [Fact]
+    public async Task GetAggregateEvents_WhenMaxSequenceSet_ShouldReturnEventsEqualToOrOlder()
+    {
+        var aggregateType = (AggregateType) "SampleAggregate";
+        var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
+        
+        var createdEventType = (EventType) "Created";
+        var updatedEventType = (EventType) "Updated";
+        EventType[] eventTypes = [createdEventType, updatedEventType];
+        var createdEventTypeId = await StorageEngine!.GetEventTypeId(createdEventType, CancellationToken.None);
+        var updatedEventTypeId = await StorageEngine!.GetEventTypeId(updatedEventType, CancellationToken.None);
+        
+        var agentType = (AgentType) "Service";
+        var agentTypeId = await StorageEngine!.GetAgentTypeId(agentType, CancellationToken.None);
+
+        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        
+        long? systemId = null;
+        AgentKey? agentKey = null;
+        var agentId = await StorageEngine!.GetAgentId(agentTypeId, agentKey, systemId, CancellationToken.None);
+
+        List<EventDto> eventDtos = new List<EventDto>();
+        eventDtos.Add(
+            new EventDto(aggregateTypeId, aggregateId, createdEventTypeId, 1, "", agentId,
+                DateTime.Parse("2024-05-15T00:00:01Z").ToUniversalTime()));
+
+        for (var j = 2; j < 20; ++j)
+        {
+           eventDtos.Add(
+                       new EventDto(aggregateTypeId, aggregateId, updatedEventTypeId, j, "", agentId,
+                           DateTime.Parse("2024-05-15T00:00:01Z").ToUniversalTime())); 
+        }
+        
+        await StorageEngine!.StoreEvents(eventDtos, CancellationToken.None);
+        var retrievedEvents = (await StorageEngine!.GetAggregateEvents(aggregateTypeId,
+            aggregateId, 0,
+            CancellationToken.None, maxSequence: 19)).ToArray();
+       
+        
+        for (var j = 1; j < 19; ++j)
+        {
+            var result = retrievedEvents.Single(x => x.Sequence == j);
+            result.Should().NotBeNull();
+        }
+        var missing = retrievedEvents.FirstOrDefault(x => x.Sequence == 20);
+        missing.Should().BeNull();
+
+    }
+
+    [Fact]
     public async Task StoreEvents_WhenDuplicateSequencesForAnAggregate_ShouldFail()
     {
         var aggregateType = (AggregateType) "SampleAggregate";
@@ -356,6 +404,19 @@ public abstract class StorageEngineTestsBase
         var retrievedSnapshot = await StorageEngine!.GetSnapshot(aggregateTypeId, aggregateId, 1, CancellationToken.None);
         retrievedSnapshot.Should().BeOfType<None<Snapshot>>();
     }
-    
+
+    [Fact]
+    public async Task GetSnapshot_ShouldNotReturnSequencesGreaterThanMaxSequence()
+    {
+        var aggregateType = (AggregateType) "SampleAggregate";
+        var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
+        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var snapshot = new SnapshotDto(aggregateTypeId, aggregateId, 3, 18, "");
+        await StorageEngine!.SaveSnapshot(snapshot, CancellationToken.None);
+
+        var retrievedSnapshot = await StorageEngine!.GetSnapshot(aggregateTypeId, aggregateId, 3, 
+            CancellationToken.None, maxSequence: 17);
+        retrievedSnapshot.Should().BeOfType<None<Snapshot>>();
+    }
     
 }

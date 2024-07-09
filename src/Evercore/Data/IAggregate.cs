@@ -35,11 +35,6 @@ public interface IAggregateTraits
     /// <param name="agent">The agent who triggered the event.</param>
     /// <param name="eventTime">The timestamp of the event.</param>
     void ApplyEvent(IEvent @event, long sequence, Agent agent, DateTime eventTime);
-
-}
-
-public interface ICommonAggregateTraits
-{
     
 }
 

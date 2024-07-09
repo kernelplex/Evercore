@@ -25,7 +25,7 @@ public class User: ISnapshotAggregate
     
     public static AggregateType AggregateType => (AggregateType) nameof(AggregateTypes.User);
     public static int SnapshotVersion => 1;
-    
+   
     public static IAggregate Initialize(long id)
     {
         return new User()
