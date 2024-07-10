@@ -1,4 +1,7 @@
+using KernelPlex.Tools.Monads.Options;
+
 namespace Evercore.Data;
+using System.Text.Json;
 
 /// <summary>
 /// The Snapshot class represents a snapshot of an aggregate in the storage engine.
@@ -95,5 +98,29 @@ public record Snapshot
         SnapshotVersion = (int) snapshotVersion;
         Sequence = sequence;
         State = state;
+    }
+    
+    public IOption<T> Deserialize<T>()
+    {
+        var deserialized = JsonSerializer.Deserialize<T>(State);
+        if (deserialized is null)
+        {
+            return new None<T>();
+        }
+
+        return new Some<T>(deserialized);
+    }
+
+    public static Snapshot FromState<TSnapshotAggregate, TState>(
+        TSnapshotAggregate aggregate, TState state) where TSnapshotAggregate : ISnapshotAggregate
+    {
+        var serializedState = JsonSerializer.Serialize(state);
+
+        return new Snapshot(
+            TSnapshotAggregate.AggregateType,
+            aggregate.Id,
+            aggregate.GetCurrentSnapshotVersion(),
+            aggregate.Sequence,
+            serializedState);
     }
 }
