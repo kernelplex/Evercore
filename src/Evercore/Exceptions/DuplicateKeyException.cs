@@ -1,5 +1,7 @@
 namespace Evercore.Exceptions;
 
+public record DuplicateKeyError(string Message);
+
 public class DuplicateKeyException : EventStoreException
 {
     public int AggregateTypeId { get; }

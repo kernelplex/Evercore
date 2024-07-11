@@ -1,6 +1,8 @@
 using Evercore.Data;
+using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 
 namespace Evercore;
 
@@ -16,7 +18,7 @@ public interface IEventStoreContextManager
     /// <param name="naturalKey">The natural key of the aggregate.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The ID of the newly created aggregate.</returns>
-    Task<long> CreateAggregate(AggregateType aggregateType, NaturalKey? naturalKey,
+    Task<IResult<long, DuplicateKeyError>> CreateAggregate(AggregateType aggregateType, NaturalKey? naturalKey,
         CancellationToken cancellationToken);
 
 

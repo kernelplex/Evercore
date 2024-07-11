@@ -3,7 +3,9 @@ using Evercore.Data;
 using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Monads;
+using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 using SqlKata.Execution;
 // ReSharper disable UnusedMember.Local
 
@@ -61,7 +63,7 @@ public class SqlKataStorageEngine : IStorageEngine
         return id;
     }
 
-    public async Task<long> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey,
+    public async Task<IResult<long,DuplicateKeyError>> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey,
         CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
@@ -76,8 +78,8 @@ public class SqlKataStorageEngine : IStorageEngine
             long? existing = await existingKeySearch.FirstOrDefaultAsync<long?>(cancellationToken: cancellationToken);
             if (existing is not null)
             {
-                throw new DuplicateKeyException("An aggregate exists with this natural key.", aggregateTypeId,
-                    naturalKey.Value);
+                return new Failure<long, DuplicateKeyError>(
+                    new DuplicateKeyError("An aggregate exists with this natural key."));
             }
         }
 
@@ -90,7 +92,7 @@ public class SqlKataStorageEngine : IStorageEngine
         }, cancellationToken: cancellationToken);
 
         transactionScope.Complete();
-        return id;
+        return new Success<long, DuplicateKeyError>(id);
     }
 
     public async Task<int> GetEventTypeId(EventType eventType, CancellationToken cancellationToken)

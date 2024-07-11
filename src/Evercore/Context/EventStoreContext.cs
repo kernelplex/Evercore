@@ -1,7 +1,10 @@
 using System.Text.Json;
 using Evercore.Data;
+using Evercore.Exceptions;
 using Evercore.StrongTypes;
+using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 
 namespace Evercore.Context;
 
@@ -16,11 +19,15 @@ public class EventStoreContext: IEventStoreContext
         _eventStoreContextManager = eventStoreContextManager;
     }
 
-    public async Task<T> Create<T>(NaturalKey? naturalKey = null, CancellationToken cancellationToken = default) where T : IAggregate
+    public async Task<IResult<T, DuplicateKeyError>> Create<T>(NaturalKey? naturalKey = null, CancellationToken cancellationToken = default) where T : IAggregate
     {
         var aggregateType = T.AggregateType;
-        var id = await _eventStoreContextManager.CreateAggregate(aggregateType, naturalKey, cancellationToken);
-        return (T) T.Initialize(id);
+        var createResult = await _eventStoreContextManager.CreateAggregate(aggregateType, naturalKey, cancellationToken);
+        return createResult.Bind<T>(x =>
+        {
+            var aggregate = T.Initialize(x);
+            return new Success<T, DuplicateKeyError>((T) aggregate);
+        });
     }
 
 

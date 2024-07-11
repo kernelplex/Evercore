@@ -1,6 +1,8 @@
 using Evercore.Data;
+using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 
 namespace Evercore.Storage;
 
@@ -18,13 +20,14 @@ public interface IStorageEngine
     Task<int> GetAggregateTypeId(AggregateType aggregateType, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Creates a new aggregate with the specified aggregate type ID and natural key.
+    /// Creates a new aggregate with the specified aggregate type ID, natural key, and cancellation token.
     /// </summary>
-    /// <param name="aggregateTypeId">The ID of the aggregate type.</param>
-    /// <param name="naturalKey">The optional natural key of the aggregate.</param>
+    /// <param name="aggregateTypeId">The aggregate type ID.</param>
+    /// <param name="naturalKey">The natural key of the aggregate. Can be null.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation. The result contains the ID of the newly created aggregate.</returns>
-    Task<long> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey, CancellationToken cancellationToken);
+    /// <returns>Returns a task representing the asynchronous operation. The result contains an instance of <see cref="IResult{TSuccess, TError}"/> where TSuccess is a long representing the newly generated aggregate ID, and TError is <see cref="DuplicateKeyError"/> if the natural key is duplicate.</returns>
+    public Task<IResult<long, DuplicateKeyError>> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves the event type ID for the given <paramref name="eventType"/>.
@@ -52,6 +55,7 @@ public interface IStorageEngine
     /// <returns>A task representing the asynchronous operation. The result contains the agent type ID.</returns>
     Task<int> GetAgentTypeId(AgentType agentType, CancellationToken cancellationToken);
 
+    /// <sumamry>
     /// Stores the given collection of event objects in the storage engine.
     /// </summary>
     /// <param name="eventDtos">The collection of event objects to store.</param>

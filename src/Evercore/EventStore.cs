@@ -9,6 +9,7 @@ using Evercore.Storage;
 using Evercore.StrongTypes;
 using Evercore.Tools;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 
 namespace Evercore;
 
@@ -208,12 +209,13 @@ public class EventStore: IEventStore, IEventStoreContextManager
     } 
 
     
-    public async Task<long> CreateAggregate(AggregateType aggregateType, NaturalKey? naturalKey, CancellationToken cancellationToken)
+    public async Task<IResult<long, DuplicateKeyError>> CreateAggregate(AggregateType aggregateType,
+        NaturalKey? naturalKey, CancellationToken cancellationToken)
     {
         var aggregateTypeId = await GetAggregateTypeId(aggregateType, cancellationToken);
         
-        var id = await _storageEngine.CreateAggregate(aggregateTypeId, naturalKey, cancellationToken);
-        return id;
+        var result = await _storageEngine.CreateAggregate(aggregateTypeId, naturalKey, cancellationToken);
+        return result;
     }
 
     public async Task<IEnumerable<AggregateEvent>> GetEvents(AggregateType aggregateType, long id, long sequence, CancellationToken cancellationToken,

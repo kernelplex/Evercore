@@ -2,7 +2,9 @@ using Evercore.Data;
 using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Monads;
+using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
 
 namespace Evercore.Storage;
 
@@ -65,23 +67,25 @@ public class TransientMemoryStorageEngine: IStorageEngine
         }
     }
 
-    public async Task<long> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey, CancellationToken cancellationToken)
+    public async Task<IResult<long, DuplicateKeyError>> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         if (naturalKey is null)
         {
-            return ++_aggregateCounter;
+            return new Success<long, DuplicateKeyError>(++_aggregateCounter);
         }
         
         var foundAggregate = _aggregates
             .FirstOrDefault(x => x.AggregateTypeId == aggregateTypeId && x?.NaturalKey == naturalKey);
-        if (foundAggregate is not null) {
-            throw new DuplicateKeyException("Aggregate with this key already exists.", aggregateTypeId, naturalKey);
+        if (foundAggregate is not null)
+        {
+            return new Failure<long, DuplicateKeyError>(
+                new DuplicateKeyError("Aggregate with this key already exists."));
         }
 
         var dto = new AggregateDto(++_aggregateCounter, aggregateTypeId, naturalKey);
         _aggregates.Add(dto);
-        return dto.Id;
+        return new Success<long, DuplicateKeyError>(dto.Id);
     }
 
     public async Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long aggregateId,

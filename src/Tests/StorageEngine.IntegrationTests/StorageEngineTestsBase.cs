@@ -3,9 +3,14 @@ using Evercore.Exceptions;
 using Evercore.Storage;
 using Evercore.StrongTypes;
 using FluentAssertions;
+using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
+using KernelPlex.Tools.Monads.Results;
+using TestTools;
 
 namespace StorageEngine.IntegrationTests;
+
+
 
 public abstract class StorageEngineTestsBase
 {
@@ -64,7 +69,7 @@ public abstract class StorageEngineTestsBase
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
         var naturalKey = (NaturalKey) "chavez01@example.com";
 
-        var id = await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None);
+        var id = (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).Unwrap();
 
         id.Should().BePositive("CreateAggregate should always generate a positive value.");
     }
@@ -75,7 +80,7 @@ public abstract class StorageEngineTestsBase
         var aggregateType = (AggregateType) "User";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
 
-        var id = await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None);
+        var id = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None)).Unwrap();
 
         id.Should().BePositive("CreateAggregate should always generate a positive value.");
         
@@ -87,8 +92,8 @@ public abstract class StorageEngineTestsBase
         var aggregateType = (AggregateType) "User";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
 
-        var id = await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None);
-        var id2 = await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None);
+        var id = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None)).Unwrap();
+        var id2 = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, cancellationToken: CancellationToken.None)).Unwrap();
 
         id.Should().BePositive("CreateAggregate should always generate a positive value.");
         id2.Should().BePositive("CreateAggregate should always generate a positive value.");
@@ -101,15 +106,9 @@ public abstract class StorageEngineTestsBase
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
         var naturalKey = (NaturalKey) "chavezz01@example.com";
 
-        var id = await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None);
-        var action = async () =>
-        {
-            _ = await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None);
-        };
-        await action.Should().ThrowAsync<DuplicateKeyException>(
-                "Should throw DuplicateKeyException on duplicate natural keys on the same aggregate.")
-            .Where(x => 
-                x.AggregateTypeId == aggregateTypeId && x.NaturalKey == naturalKey);
+        var success = (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).Unwrap();
+        var error = (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).UnwrapError();
+        error.Should().NotBeNull();
     }
 
     [Fact]
@@ -243,7 +242,7 @@ public abstract class StorageEngineTestsBase
         var agentType = (AgentType) "Service";
         var agentTypeId = await StorageEngine!.GetAgentTypeId(agentType, CancellationToken.None);
 
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         
         long? systemId = null;
         AgentKey? agentKey = null;
@@ -293,7 +292,7 @@ public abstract class StorageEngineTestsBase
         var agentType = (AgentType) "Service";
         var agentTypeId = await StorageEngine!.GetAgentTypeId(agentType, CancellationToken.None);
 
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         
         long? systemId = null;
         AgentKey? agentKey = null;
@@ -341,7 +340,7 @@ public abstract class StorageEngineTestsBase
         var agentType = (AgentType) "Service";
         var agentTypeId = await StorageEngine!.GetAgentTypeId(agentType, CancellationToken.None);
 
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         
         long? systemId = null;
         AgentKey? agentKey = null;
@@ -366,7 +365,7 @@ public abstract class StorageEngineTestsBase
     {
         var aggregateType = (AggregateType) "SampleAggregate";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         var snapshot = new SnapshotDto(aggregateTypeId, aggregateId, 1, 12, "");
         await StorageEngine!.SaveSnapshot(snapshot, CancellationToken.None);
 
@@ -387,7 +386,7 @@ public abstract class StorageEngineTestsBase
     {
         var aggregateType = (AggregateType) "SampleAggregate";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         var snapshot = new SnapshotDto(aggregateTypeId, aggregateId, 1, 12, "");
         await StorageEngine!.SaveSnapshot(snapshot, CancellationToken.None);
 
@@ -400,7 +399,7 @@ public abstract class StorageEngineTestsBase
     {
         var aggregateType = (AggregateType) "SampleAggregate";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId = (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         var retrievedSnapshot = await StorageEngine!.GetSnapshot(aggregateTypeId, aggregateId, 1, CancellationToken.None);
         retrievedSnapshot.Should().BeOfType<None<Snapshot>>();
     }
@@ -410,7 +409,8 @@ public abstract class StorageEngineTestsBase
     {
         var aggregateType = (AggregateType) "SampleAggregate";
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
-        var aggregateId = await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None);
+        var aggregateId =
+            (await StorageEngine!.CreateAggregate(aggregateTypeId, null, CancellationToken.None)).Unwrap();
         var snapshot = new SnapshotDto(aggregateTypeId, aggregateId, 3, 18, "");
         await StorageEngine!.SaveSnapshot(snapshot, CancellationToken.None);
 
