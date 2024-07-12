@@ -2,7 +2,6 @@
 using Evercore.Data;
 using Evercore.Exceptions;
 using Evercore.StrongTypes;
-using KernelPlex.Monads;
 using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
 using KernelPlex.Tools.Monads.Results;
@@ -191,7 +190,7 @@ public class SqlKataStorageEngine : IStorageEngine
         return id;
     }
 
-    public async Task StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken)
+    public async Task<IResult<bool, SequenceError>> StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken)
     {
         using var queryFactory = await _queryFactoryProvider(cancellationToken);
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -216,8 +215,7 @@ public class SqlKataStorageEngine : IStorageEngine
         {
             if (eventDto.Sequence != ++aggregateSequences[eventDto.AggregateId])
             {
-                throw new AggregateSequenceException("Aggregate sequence integrity error.", eventDto.AggregateTypeId,
-                    @eventDto.AggregateId, @eventDto.Sequence);
+                return new Failure<bool, SequenceError>(new SequenceError());
             }
 
             // Ensure times are stored as universal times
@@ -250,6 +248,7 @@ public class SqlKataStorageEngine : IStorageEngine
         }
 
         transactionScope.Complete();
+        return new Success<bool, SequenceError>(true);
     }
 
 

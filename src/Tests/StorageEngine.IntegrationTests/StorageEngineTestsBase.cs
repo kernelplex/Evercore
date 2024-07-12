@@ -106,7 +106,7 @@ public abstract class StorageEngineTestsBase
         var aggregateTypeId = await StorageEngine!.GetAggregateTypeId(aggregateType, CancellationToken.None);
         var naturalKey = (NaturalKey) "chavezz01@example.com";
 
-        var success = (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).Unwrap();
+        (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).Unwrap();
         var error = (await StorageEngine!.CreateAggregate(aggregateTypeId, naturalKey, CancellationToken.None)).UnwrapError();
         error.Should().NotBeNull();
     }
@@ -352,12 +352,9 @@ public abstract class StorageEngineTestsBase
             new EventDto(aggregateTypeId, aggregateId, updatedEventTypeId, 1, "", agentId,
                 DateTime.Parse("2024-05-15T00:00:01Z"))
         };
+        var result = (await StorageEngine!.StoreEvents(events, CancellationToken.None)).UnwrapError();
 
-        var action = async () =>
-        {
-            await StorageEngine!.StoreEvents(events, CancellationToken.None);
-        };
-        await action.Should().ThrowAsync<AggregateSequenceException>();
+        result.Should().BeOfType<SequenceError>();
     }
     
     [Fact]

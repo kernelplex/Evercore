@@ -55,13 +55,14 @@ public interface IStorageEngine
     /// <returns>A task representing the asynchronous operation. The result contains the agent type ID.</returns>
     Task<int> GetAgentTypeId(AgentType agentType, CancellationToken cancellationToken);
 
-    /// <sumamry>
-    /// Stores the given collection of event objects in the storage engine.
+    /// <summary>
+    /// Stores the given event data in the storage engine.
     /// </summary>
-    /// <param name="eventDtos">The collection of event objects to store.</param>
+    /// <param name="eventDtos">The event data to store.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken);
+    /// <returns>A task representing the asynchronous operation. The result contains a boolean indicating whether the event data was successfully stored and any sequence errors encountered.</returns>
+    Task<IResult<bool, SequenceError>>
+        StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves the aggregate events for the specified <paramref name="aggregateTypeId"/>, <paramref name="id"/>, and <paramref name="minSequence"/>.

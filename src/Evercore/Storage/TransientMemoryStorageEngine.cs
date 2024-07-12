@@ -46,7 +46,7 @@ public class TransientMemoryStorageEngine: IStorageEngine
         return _agentTypes.GetByKey(agentType);
     }
 
-    public async Task StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken)
+    public async Task<IResult<bool, SequenceError>> StoreEvents(IEnumerable<EventDto> eventDtos, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         foreach (var @event in eventDtos)
@@ -59,12 +59,13 @@ public class TransientMemoryStorageEngine: IStorageEngine
 
             if (@event.Sequence != currentSequence + 1)
             {
-                throw new AggregateSequenceException("Aggregate sequence integrity error.", @event.AggregateTypeId,
-                    @event.AggregateId, @event.Sequence);
+                return new Failure<bool, SequenceError>(new SequenceError());
             }
             _events.Add(@event);
             _aggregateSequenceMap[@event.AggregateId] = @event.Sequence;
         }
+
+        return new Success<bool, SequenceError>(true);
     }
 
     public async Task<IResult<long, DuplicateKeyError>> CreateAggregate(int aggregateTypeId, NaturalKey? naturalKey, CancellationToken cancellationToken)
