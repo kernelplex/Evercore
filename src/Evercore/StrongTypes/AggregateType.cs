@@ -1,6 +1,4 @@
-using Evercore.StrongTypes;
-
-namespace Evercore.Data;
+namespace Evercore.StrongTypes;
 
 /// <summary>
 /// Represents an aggregate type.

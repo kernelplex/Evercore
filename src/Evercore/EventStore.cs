@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Transactions;
 using Evercore.Context;
 using Evercore.Data;
+using Evercore.Errors;
 using Evercore.Exceptions;
 using Evercore.Storage;
 using Evercore.StrongTypes;

@@ -1,11 +1,10 @@
 using Evercore.Data;
+using Evercore.Errors;
 using Evercore.Exceptions;
 using Evercore.Storage;
 using Evercore.StrongTypes;
 using FluentAssertions;
-using KernelPlex.Monads.Results;
 using KernelPlex.Tools.Monads.Options;
-using KernelPlex.Tools.Monads.Results;
 
 namespace StorageEngine.IntegrationTests;
 
@@ -284,7 +283,6 @@ public abstract class StorageEngineTestsBase
         
         var createdEventType = (EventType) "Created";
         var updatedEventType = (EventType) "Updated";
-        EventType[] eventTypes = [createdEventType, updatedEventType];
         var createdEventTypeId = await StorageEngine!.GetEventTypeId(createdEventType, CancellationToken.None);
         var updatedEventTypeId = await StorageEngine!.GetEventTypeId(updatedEventType, CancellationToken.None);
         

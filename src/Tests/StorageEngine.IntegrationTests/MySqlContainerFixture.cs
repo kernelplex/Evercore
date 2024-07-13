@@ -1,7 +1,6 @@
 using Evercore.Storage.SqlKata;
 using Evercore.Storage.SqlKata.FluentMigrations;
 using FluentMigrator.Runner;
-using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -25,7 +24,7 @@ public class MySqlContainerFixture : IDisposable
         task.Wait();
         var connectionString = _dbContainer.GetConnectionString();
         ApplyMigrations(connectionString);
-        StorageEngine = new SqlKataStorageEngine(async (CancellationToken stoppingToken) =>
+        StorageEngine = new SqlKataStorageEngine(async stoppingToken =>
         {
             var connection = new MySqlConnection(connectionString);
             await connection.OpenAsync(stoppingToken);

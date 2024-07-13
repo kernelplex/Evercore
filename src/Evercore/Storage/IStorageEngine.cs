@@ -1,5 +1,5 @@
 using Evercore.Data;
-using Evercore.Exceptions;
+using Evercore.Errors;
 using Evercore.StrongTypes;
 using KernelPlex.Tools.Monads.Options;
 using KernelPlex.Tools.Monads.Results;
@@ -75,14 +75,16 @@ public interface IStorageEngine
     /// <returns>A task representing the asynchronous operation. The result contains a collection of aggregate events.</returns>
     Task<IEnumerable<AggregateEvent>> GetAggregateEvents(int aggregateTypeId, long id, long minSequence,
         CancellationToken cancellationToken, long? maxSequence = null);
- 
+
     /// <summary>
     /// Saves the snapshot specified by the <paramref name="snapshotDto"/>.
     /// </summary>
     /// <param name="snapshotDto">The snapshot to be saved.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SaveSnapshot(SnapshotDto snapshotDto, CancellationToken cancellationToken);
 
+    /// <summary>
     /// Retrieves the snapshot for the given aggregate type ID, aggregate ID, and version.
     /// </summary>
     /// <param name="aggregateTypeId">The ID of the aggregate type.</param>

@@ -1,4 +1,5 @@
 using Evercore.Data;
+using Evercore.Errors;
 using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Tools.Monads.Results;

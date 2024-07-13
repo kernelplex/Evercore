@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Evercore.Data;
+using Evercore.Errors;
 using Evercore.Exceptions;
 using Evercore.StrongTypes;
 using KernelPlex.Monads.Results;
@@ -26,7 +27,7 @@ public class EventStoreContext: IEventStoreContext
         return createResult.Bind<T>(x =>
         {
             var aggregate = initializer(x);
-            return new Success<T, DuplicateKeyError>((T) aggregate);
+            return new Success<T, DuplicateKeyError>(aggregate);
         });
     }
 

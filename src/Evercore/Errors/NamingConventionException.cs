@@ -1,3 +1,5 @@
+using Evercore.Errors;
+
 namespace Evercore.Exceptions;
 
 public class NamingConventionException : EventStoreException

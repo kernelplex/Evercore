@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Evercore.StrongTypes;
 
 namespace Evercore.Data;
 

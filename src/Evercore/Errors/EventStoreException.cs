@@ -1,8 +1,8 @@
-namespace Evercore.Exceptions;
+namespace Evercore.Errors;
 
 public abstract class EventStoreException : Exception
 {
-    protected EventStoreException() : base()
+    protected EventStoreException()
     {
     }
 
