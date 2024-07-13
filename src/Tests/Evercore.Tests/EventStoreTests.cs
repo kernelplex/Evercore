@@ -16,14 +16,14 @@ public class EventStoreTests
     {
         _transientMemoryStorageEngine = new TransientMemoryStorageEngine();
         _eventStore = new EventStore(_transientMemoryStorageEngine);
-        _eventStore.RegisterEventsInAssembly(typeof(UserCreatedEvent).Assembly);
+        _eventStore.RegisterEventsInAssembly(typeof(UserRegistered).Assembly);
     }
 
     record UserScenarioResults(object[] PublishedEvents, EventStoreContext CapturedContext, Agent Agent, User user);
     private async Task<UserScenarioResults> UserScenario(int updateCount = 15)
     {
         var agent = new Agent((AgentType) "UnitTest", (AgentKey) nameof(EventsAreCapturedInContext));
-        var userCreated = new UserCreatedEvent("Robert", "Chavez", "chavez@example.com");
+        var userCreated = new UserRegistered("Robert", "Chavez", "chavez@example.com");
         var events = new List<object>() {userCreated};
         var dateTime = DateTime.UtcNow;
         EventStoreContext? capturedContext = null; 
@@ -34,7 +34,7 @@ public class EventStoreTests
             context.Apply(userCreated, user, agent, dateTime);
             for (var j = 0; j < updateCount; ++j)
             {
-                var userUpdated = new UserUpdatedEvent(Email: $"rchavez{j}@example.com");
+                var userUpdated = new UserUpdated(Email: $"rchavez{j}@example.com");
                 context.Apply(userUpdated, user, agent, dateTime);
                 events.Add(userUpdated);
             }
