@@ -19,23 +19,23 @@ public class EventStoreContext: IEventStoreContext
         _eventStoreContextManager = eventStoreContextManager;
     }
 
-    public async Task<IResult<T, DuplicateKeyError>> Create<T>(NaturalKey? naturalKey = null, CancellationToken cancellationToken = default) where T : IAggregate
+    public async Task<IResult<T, DuplicateKeyError>> Create<T>(Func<long, T> initializer, NaturalKey? naturalKey = null, CancellationToken cancellationToken = default) where T : IAggregate
     {
         var aggregateType = T.AggregateType;
         var createResult = await _eventStoreContextManager.CreateAggregate(aggregateType, naturalKey, cancellationToken);
         return createResult.Bind<T>(x =>
         {
-            var aggregate = T.Initialize(x);
+            var aggregate = initializer(x);
             return new Success<T, DuplicateKeyError>((T) aggregate);
         });
     }
 
-
-    public async Task<IOption<T>> Load<T>(long id, long? maxSequence = null, CancellationToken cancellationToken = default) where T : IAggregate
+    public async Task<IOption<T>> Load<T>(Func<long, T> initializer, long id, long? maxSequence = null,
+        CancellationToken cancellationToken = default) where T : IAggregate
     {
         var aggregateType = T.AggregateType;
+        var aggregate = initializer(id);
         
-        var aggregate = (T) T.Initialize(id);
         long sequence = 0;
         var aggregateLoaded = false;
         if (aggregate is ISnapshotAggregateTraits snapshotAggregate)
@@ -83,6 +83,9 @@ public class EventStoreContext: IEventStoreContext
 
         return new Some<T>(aggregate);
     }
+    
+
+
 
     public void Apply<TEvent, TAggregate>(TEvent @event, TAggregate aggregate, Agent agent, DateTime? eventTime = null)
         where TEvent : IEvent where TAggregate : IAggregate

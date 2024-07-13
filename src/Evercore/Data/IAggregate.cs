@@ -55,12 +55,6 @@ public interface IAggregate: IAggregateTraits
     /// </remarks>
     static abstract AggregateType AggregateType { get; }
 
-    /// <summary>
-    /// Initializes an instance of the aggregate object with the specified ID.
-    /// </summary>
-    /// <param name="id">The ID of the aggregate.</param>
-    /// <returns>The initialized aggregate object.</returns>
-    static abstract IAggregate Initialize(long id);
 }
 
 public interface ISnapshotAggregate : IAggregate, ISnapshotAggregateTraits

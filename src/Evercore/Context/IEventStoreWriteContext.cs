@@ -11,14 +11,16 @@ namespace Evercore.Context;
 public interface IEventStoreWriteContext: IEventStoreContextPublisher
 {
     /// <summary>
-    /// Creates a new aggregate object of type TAggregate in the event store context.
+    /// Creates a new aggregate of type T in the event store context.
     /// </summary>
-    /// <typeparam name="TAggregate">The type of aggregate to create.</typeparam>
-    /// <param name="naturalKey">The natural key for the aggregate.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The created aggregate object.</returns>
-    Task<IResult<TAggregate, DuplicateKeyError>> Create<TAggregate>(NaturalKey? naturalKey = null, CancellationToken cancellationToken = default)
-        where TAggregate : IAggregate;
+    /// <typeparam name="T">The type of aggregate to create.</typeparam>
+    /// <param name="initializer">A function that initializes the aggregate instance.</param>
+    /// <param name="naturalKey">An optional natural key for the aggregate.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IResult instance
+    /// that wraps the created aggregate or a DuplicateKeyError if the natural key is already in use.</returns>
+    Task<IResult<T, DuplicateKeyError>> Create<T>(Func<long, T> initializer, NaturalKey? naturalKey = null,
+        CancellationToken cancellationToken = default) where T : IAggregate;
 
     /// <summary>
     /// Retrieves the captured events from the event store context.

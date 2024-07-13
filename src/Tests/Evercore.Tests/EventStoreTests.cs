@@ -31,7 +31,7 @@ public class EventStoreTests
         var user = await _eventStore.WithContext<User>(async (context, cancellationToken) =>
         {
             capturedContext = (EventStoreContext) context;
-            var user = (await context.Create<User>(cancellationToken: cancellationToken)).Unwrap();
+            var user = (await context.Create<User>(User.Initialize, cancellationToken: cancellationToken)).Unwrap();
             context.Apply(userCreated, user, agent, dateTime);
             for (var j = 0; j < updateCount; ++j)
             {
